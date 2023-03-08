@@ -16,7 +16,7 @@ def remove_chastisements(schoolkid):
     chastisement.delete()
 
 
-def create_commendation(subject):
+def create_commendation(subject, schoolkid):
     commendation_examples = [
         "Молодец!",
         "Отлично!",
@@ -49,7 +49,7 @@ def create_commendation(subject):
         "Ты многое сделал, я это вижу!",
         "Теперь у тебя точно все получится!"
     ]
-    student = Schoolkid.objects.get(full_name__contains="Фролов Иван")
+    student = Schoolkid.objects.get(full_name__contains=schoolkid)
     lesson = Lesson.objects.filter(subject__title=subject, subject__year_of_study=student.year_of_study).order_by(
         "-date").first()
     if lesson is None:
