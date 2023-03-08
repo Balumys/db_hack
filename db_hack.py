@@ -1,8 +1,7 @@
 import random
-import sys
 
 from datacenter.models import Schoolkid, Mark, Chastisement, Lesson, Commendation
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 COMMENDATION_EXAMPLES = [
     "Молодец!",
@@ -42,7 +41,9 @@ def fix_marks(schoolkid):
     try:
         student = Schoolkid.objects.get(full_name__contains=schoolkid)
     except ObjectDoesNotExist as err:
-        sys.exit(err)
+        return print(err)
+    except MultipleObjectsReturned as err:
+        return print(f"{err} Specify exact name")
     marks = Mark.objects.filter(schoolkid=student, points__in=[2, 3])
     for mark in marks:
         mark.points = 5
@@ -53,13 +54,20 @@ def remove_chastisements(schoolkid):
     try:
         student = Schoolkid.objects.get(full_name__contains=schoolkid)
     except ObjectDoesNotExist as err:
-        sys.exit(err)
+        return print(err)
+    except MultipleObjectsReturned as err:
+        return print(f"{err} Specify exact name")
     chastisement = Chastisement.objects.filter(schoolkid=student)
     chastisement.delete()
 
 
 def create_commendation(subject, schoolkid):
-    student = Schoolkid.objects.get(full_name__contains=schoolkid)
+    try:
+        student = Schoolkid.objects.get(full_name__contains=schoolkid)
+    except ObjectDoesNotExist as err:
+        return print(err)
+    except MultipleObjectsReturned as err:
+        return print(f"{err} Specify exact name")
     lesson = Lesson.objects.filter(subject__title=subject, subject__year_of_study=student.year_of_study).order_by(
         "-date").first()
     if lesson is None:
