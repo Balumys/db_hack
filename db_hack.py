@@ -44,10 +44,8 @@ def fix_marks(schoolkid):
         return print(err)
     except MultipleObjectsReturned as err:
         return print(f"{err} Specify exact name")
-    marks = Mark.objects.filter(schoolkid=student, points__in=[2, 3])
-    for mark in marks:
-        mark.points = 5
-        mark.save()
+    Mark.objects.filter(schoolkid=student, points__in=[2, 3]).update(points=5)
+
 
 
 def remove_chastisements(schoolkid):
