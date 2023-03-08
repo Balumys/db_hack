@@ -1,9 +1,15 @@
 import random
+import sys
+
 from datacenter.models import Schoolkid, Mark, Chastisement, Lesson, Commendation
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def fix_marks(schoolkid):
-    student = Schoolkid.objects.get(full_name__contains=schoolkid)
+    try:
+        student = Schoolkid.objects.get(full_name__contains=schoolkid)
+    except ObjectDoesNotExist as err:
+        sys.exit(err)
     marks = Mark.objects.filter(schoolkid=student, points__in=[2, 3])
     for mark in marks:
         mark.points = 5
@@ -11,7 +17,10 @@ def fix_marks(schoolkid):
 
 
 def remove_chastisements(schoolkid):
-    student = Schoolkid.objects.get(full_name__contains=schoolkid)
+    try:
+        student = Schoolkid.objects.get(full_name__contains=schoolkid)
+    except ObjectDoesNotExist as err:
+        sys.exit(err)
     chastisement = Chastisement.objects.filter(schoolkid=student)
     chastisement.delete()
 
