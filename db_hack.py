@@ -37,35 +37,29 @@ COMMENDATION_EXAMPLES = [
 ]
 
 
-def fix_marks(schoolkid):
+def get_student(schoolkid):
     try:
         student = Schoolkid.objects.get(full_name__contains=schoolkid)
+        return student
     except ObjectDoesNotExist as err:
         return print(err)
     except MultipleObjectsReturned as err:
         return print(f"{err} Specify exact name")
+
+
+def fix_marks(schoolkid):
+    student = get_student(schoolkid)
     Mark.objects.filter(schoolkid=student, points__in=[2, 3]).update(points=5)
 
 
-
 def remove_chastisements(schoolkid):
-    try:
-        student = Schoolkid.objects.get(full_name__contains=schoolkid)
-    except ObjectDoesNotExist as err:
-        return print(err)
-    except MultipleObjectsReturned as err:
-        return print(f"{err} Specify exact name")
+    student = get_student(schoolkid)
     chastisement = Chastisement.objects.filter(schoolkid=student)
     chastisement.delete()
 
 
 def create_commendation(subject, schoolkid):
-    try:
-        student = Schoolkid.objects.get(full_name__contains=schoolkid)
-    except ObjectDoesNotExist as err:
-        return print(err)
-    except MultipleObjectsReturned as err:
-        return print(f"{err} Specify exact name")
+    student = get_student(schoolkid)
     lesson = Lesson.objects.filter(subject__title=subject, subject__year_of_study=student.year_of_study).order_by(
         "-date").first()
     if lesson is None:
